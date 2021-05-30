@@ -8,10 +8,6 @@ from datetime import datetime
 from functools import reduce
 
 
-# Мне так и не удалось запустить для сайта Росстата в headless режиме
-# но с запуском браузера всё работает на ура
-# надо попробовать посмотреть на размер открываемого окна и другие варианты
-
 class CPIparser:
     """
     Downloads CPI data files from Rosstat website and
