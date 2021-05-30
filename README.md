@@ -1,2 +1,2 @@
 # CPI
-Parsing and prediction of russian CPI
+Parsing and prediction of russian CPI.
