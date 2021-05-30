@@ -30,9 +30,9 @@ class CPIparser:
 
     def get_gks_data(self):
         """
-
+        Loads .xlsx files with all necessary data from FSS site and saves them on self.save_path
         """
-        # start webdriver
+        
         base_page = requests.get(self.url)
         soup = BeautifulSoup(base_page.content, features="lxml")
         all_links = [el['href'] for el in soup.find_all('a', href=True)]
@@ -109,12 +109,10 @@ class CPIparser:
         df.index = df.index.to_period('M').to_timestamp('M')
         df.index.name = 'month'
 
-        # clean_data_path = save_path / file_name
-        # df['cpi'].to_csv(clean_data_path)
         df.drop(columns=['year', 'month'], inplace=True)
         df = df.apply(lambda x: (x - 100) / 100)
         print(f'Data for {file_path} is reformated')
-        # добавить имена, как df['cpi']
+        
         return df
 
     @staticmethod
@@ -153,26 +151,26 @@ class CPIparser:
     def preprocess_files(self,
                          open_path='default',
                          save_path='default',
-                         file_name='clean_cpi.csv'):
-        # Здесь препроцессинг только одного файла, а надо все
+                         file_name='clean_data.csv'):
+        
         '''
+        Preprocesses all files with raw data from FSS site saved on
+        open_path, merges them and stores under file_name on save_path
         ! Works properly if in directory are only data files related to the project !
         '''
+        
         # if no specific path to save data is supplied, save at the same path
         open_path = self.save_path if open_path == 'default' else open_path
         save_path = self.save_path if save_path == 'default' else save_path
 
-        # разобраться, добавить в аргументы метода, добавить возможность других файлов
-        # учесть, что для весов данные начинаются с другой даты
-        # и поделить веса на 100
-        # и потом в методе preprocess обработать сразу несколько файлов
+        
         p = Path(open_path).glob('**/*')
         files = []
         for x in p:
             if x.is_file() and '.xlsx' in str(x):
                 files.append(x)
 
-        print(files)
+        
         # sorted guarantees that we will start not from the weights file 
         # which has no observations from 1991 to 2006
         df_list = list(map(lambda x: \
@@ -189,10 +187,10 @@ class CPIparser:
                           'foods_weight', 'nonfoods_weight', 'services_weight']
         merged = merged.apply(lambda x: round(x, 5))
 
-        merged.to_csv(save_path / 'clean_data.csv')
+        merged.to_csv(save_path / file_name)
 
 
 if __name__ == '__main__':
     parser = CPIparser()
-    # parser.get_gks_data()
+    parser.get_gks_data()
     parser.preprocess_files()
